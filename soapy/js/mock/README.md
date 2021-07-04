@@ -1,0 +1,2 @@
+# NullBufferSplit
+Useful for cases were you want to send JSON over a socket.  This class allows the sender to place null bytes between each json message and the listner to extract complete json messages.

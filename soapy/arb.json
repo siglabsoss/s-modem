@@ -1,0 +1,97 @@
+{
+
+"_____comment":"put , on the first line for easy moving of lines around"
+
+,"net" : {
+	"zmq":{
+		"listen"   :10005
+	}
+	,"dashboard": {
+		"do_connect":false
+	}
+	,"gnuradio_udp": {
+		"do_connect":false
+		,"do_connect_2":false
+	}
+	,"gnuradio_attached": {
+		"_comment": "setting to false will disable normal soapy/gnuradio operation"
+		,"send_data":false
+	}
+	,"network": {
+		"discovery_port0": 10006
+		,"discovery_port1": 10007
+		,"discovery_ip": "net1.siglabs"
+		,"comment": "Which ip should our zmq peers use to conenct to us (office ip address)"
+		,"pc_ip": "192.168.2.48"
+	}
+	,"tun": {
+		"_comment": "will run ip commands"
+		,"create_up_and_ip": false
+		,"ip":"10.2.4.1/24"
+		,"user":"root"
+	}
+}
+
+,"global" : {
+	"performance" :{
+		"DEBUG_PRINT_LOOPS":true
+	}
+	,"naked": 42
+	,"mole": "rat"
+	,"print" : {
+		 "PRINT_PEER_RB":true
+		,"PRINT_TDMA_SC": 0
+		,"PRINT_SFO_CFO_ESTIMATES": true
+		,"PRINT_COOKED_BER": false
+		,"PRINT_RE_NEW_MESSAGE": false
+		,"PRINT_RE_FINE_SCHEDULE": true
+		,"PRINT_TX_BUFFER_FILL": false
+		,"PRINT_VERIFY_HASH":false
+		,"PRINT_RECEIVED_ZMQ":false
+		,"PRINT_OUTGOING_ZMQ":false
+		,"PRINT_DISPATCH_MOCK_RPC":false
+		,"PRINT_TX_FLUSH_LOW_PRI":false
+	}
+}
+
+
+,"data": {
+	"comment":"If no packets are queued to transmit, make sure 1 is always sent per period"
+	,"send_packet_when_idle":true
+	,"hash": {
+		"_comment": "This will cause both sides to zmq the hash of every packet"
+		,"validate_all":true
+	}
+}
+
+
+
+,"_______comment": "exp is short for experiment"
+,"exp": {
+	"our": {
+		"role":"arb"
+		,"zmq_name": "nuc arbiter"
+		,"id": 18
+	}
+	,"peers": {
+		 "t0":1
+		,"t1":2
+	}
+	,"DSP_WAIT_FOR_PEERS": 2
+	,"___comment": "this must match what the node.csv has"
+	,"rx_master_peer": 17
+	,"dashtie_into_mock":false
+	,"js": {
+		 "comment":"Controls in this section are read by js code."
+		,"pseudo_random_pattern": {
+			"tx_inject":false
+			,"rx_catch":false
+		}
+	}
+}
+
+,"runtime": {
+	"_comment":"do not add values here, these will be created at runtime"
+}
+
+}

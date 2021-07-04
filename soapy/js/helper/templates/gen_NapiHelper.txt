@@ -1,0 +1,227 @@
+#pragma once
+
+#define __XSTR(s) _STR(s)
+#define __STR(s) #s
+
+
+
+///////
+//
+// Add new return types here
+
+<% for(let x of outs) { %>#define __RETURNTYPE_<%=x.t%> <%=x.js%>
+<% } %>
+
+
+
+///////
+//
+// For every type the system will see, you must copy a line here
+// void is the only type that does not have this line
+
+<% for(let x of outsNoVoid) { %>
+#define _CAP_RETURN_<%=x.t%> auto returnValue = <% } %>
+#define _CAP_RETURN_void
+
+
+
+///////
+//
+// Add new code to check valid inputs for combinations of inputs
+
+<% for(let x of comb) { %>
+#define _NAPI_VALIDATE_INPUTS<%=x.path%>(fn) \
+<%=x.validate%><% } %>
+#define _NAPI_VALIDATE_INPUTS_void(fn) \
+  bool call_notok = info.Length() != 0; \
+  if (call_notok) { \
+    Napi::TypeError::New(env, __STR(fn) "() not expecting any arguments.").ThrowAsJavaScriptException(); \
+  }
+
+
+
+///////
+//
+// Add new code to pass args for combinations of signatures
+// this could be combined with previous section
+<% for(let x of comb) { %>
+#define _NAPI_CALL<%=x.path%>(path,fn,rt) \<% for(let [k,y] of x.ins.entries()) { %>
+auto arg<%=k%> = info[<%=k%>].<%=y.conv%>; \<% } %>
+_CAP_RETURN(rt) path fn(<% for(let i = 0; i < x.ins.length;i++) { %>arg<%=i%><%=i+1<x.ins.length?',':''%><% } %>);
+<% } %>
+#define _NAPI_CALL_void(path,fn,rt) \
+_CAP_RETURN(rt) path fn();
+
+
+
+///////
+//
+// Add new code for converting return types
+<% for(let x of outsNoVoid) { %>
+#define _NAPI_TAIL_<%=x.t%>(grab) \
+  return <%=x.js%>::New(env, grab); \
+}
+<% } %>
+#define _NAPI_TAIL_void(grab) \
+  return; \
+}
+
+
+#define _NAPI_HEADER(rt,fn) __RETURNTYPE_##rt fn##__wrapped(const Napi::CallbackInfo& info);
+
+
+#define _NAPI_HEAD(path,x,rt) __RETURNTYPE_##rt path x##__wrapped (const Napi::CallbackInfo& info) { \
+  auto env = info.Env();
+
+
+
+// https://stackoverflow.com/questions/2831934/how-to-use-if-inside-define-in-the-c-preprocessor
+#define _CAP_RETURN2(x) _CAP_RETURN_##x
+#define _CAP_RETURN(x) _CAP_RETURN2(x)
+
+
+/////////////////
+//
+// Manual versions of variadic function
+// Call this in the body
+// The inputs are
+// path, anything before the function name (ie namespace::namespace2:: ) 
+// fn, the function name
+// rt, the return type (void is valid as well)
+// t0, t1, ... the n input types
+
+#define _GET_NAPI_BODY_MACRO(<% for(let i = 1; i < vargs.length; i++) { %>_<%=i%>,<% } %>NAME,...) NAME
+#define _NAPI_BODY(...) \
+_GET_NAPI_BODY_MACRO(__VA_ARGS__,<% for(let i = vargs.length-1; i >= 2; i--) { %>_NAPI_BODY<%=i%><%=i>2?',':''%><% } %>)(__VA_ARGS__)
+
+
+
+#define _NAPI_BODY2(fn, rt) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_CALL_##rt(, fn) \
+_NAPI_TAIL_##rt(returnValue)
+<% for(let i = 3; i < vargs.length; i++) { %>
+#define _NAPI_BODY<%=i%>(fn, rt<% for(let j = 0; j < i-2; j++) { %>, t<%=j%><% } %> ) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##<%for(let j = 0; j < i-2; j++){%><%=j!=0?'##_##':''%>t<%=j%><% } %>(fn) \
+_NAPI_CALL_##<%for(let j = 0; j < i-2; j++){%><%=j!=0?'##_##':''%>t<%=j%><% } %>(, fn, rt) \
+_NAPI_TAIL_##rt(returnValue)
+<% } %>
+
+
+
+
+
+
+
+#define _GET_NAPI_BOUND_MACRO(<% for(let i = 1; i < vargs.length; i++) { %>_<%=i%>,<% } %>NAME,...) NAME
+#define _NAPI_BOUND(...) \
+_GET_NAPI_BOUND_MACRO(__VA_ARGS__,<% for(let i = vargs.length-1; i >= 2; i--) { %>_NAPI_BOUND<%=i%><%=i>2?',':''%><% } %>)(__VA_ARGS__)
+
+
+
+#define _NAPI_BOUND3(path, fn, rt) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_CALL_##rt(path, fn) \
+_NAPI_TAIL_##rt(returnValue)
+<% for(let i = 4; i < vargs.length; i++) { %>
+#define _NAPI_BOUND<%=i%>(path, fn, rt<% for(let j = 0; j < i-3; j++) { %>, t<%=j%><% } %> ) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##<%for(let j = 0; j < i-3; j++){%><%=j!=0?'##_##':''%>t<%=j%><% } %>(fn) \
+_NAPI_CALL_##<%for(let j = 0; j < i-3; j++){%><%=j!=0?'##_##':''%>t<%=j%><% } %>(path, fn, rt) \
+_NAPI_TAIL_##rt(returnValue)
+<% } %>
+
+// Only use if you want to bind against "exports"
+#define _NAPI_BIND_NAME(name,path,fn) \
+exports.Set(name, Napi::Function::New(env, path fn##__wrapped))
+
+#define _NAPI_BIND_NAME_SINGLE_PATH(bindto,path,fn) \
+bindto.Set(__STR(fn), Napi::Function::New(env, path fn##__wrapped))
+
+#define _NAPI_BIND_NAME_SINGLE(bindto,fn) \
+bindto.Set(__STR(fn), Napi::Function::New(env, fn##__wrapped))
+
+// Only use if you want to bind against "exports"
+#define _NAPI_BIND_MANUAL(name,path,fn) \
+exports.Set(name, Napi::Function::New(env, path fn))
+
+
+
+///////
+//
+// Getter for a member variable
+#define _NAPI_MEMBER_GETTER(path,fn,t0) \
+_NAPI_HEAD(,get_##fn,t0) \
+_NAPI_TAIL_##t0(path fn)
+
+///////
+//
+// Setter for a member variable
+// we abuse the previously written CALL_int()
+// by settings fn argument to an empty string, and putting an = in the fn argument
+// also we put a void in the return type
+#define _NAPI_MEMBER_SETTER(path,fn,t0) \
+_NAPI_HEAD(,set_##fn,t0) \
+_NAPI_VALIDATE_INPUTS_##t0(fn) \
+_NAPI_CALL_##t0(path fn = ,, void) \
+_NAPI_TAIL_##t0(path fn)
+
+#define _NAPI_MEMBER(path,fn,t0) \
+_NAPI_MEMBER_GETTER(path,fn,t0) \
+_NAPI_MEMBER_SETTER(path,fn,t0)
+
+
+#define _NAPI_MEMBER_INIT(obj,fn) \
+{ \
+PropertyDescriptor pd = Napi::PropertyDescriptor::Accessor(env, obj, __STR(fn), get_##fn##__wrapped, set_##fn##__wrapped); \
+obj.DefineProperty(pd); \
+}
+
+#define _NAPI_MEMBER_INIT_NS(obj,ns,fn) \
+{ \
+PropertyDescriptor pd = Napi::PropertyDescriptor::Accessor(env, obj, __STR(fn), ns get_##fn##__wrapped, ns set_##fn##__wrapped); \
+obj.DefineProperty(pd); \
+}
+
+#define _NAPI_GENERIC_INIT(obj,fn) \
+status = napi_set_named_property(env, obj, __STR(fn), Napi::Function::New(env, fn##__wrapped));
+
+
+/////////
+//
+// graveyard
+//
+// these macros approximate this code:
+
+//Napi::Number signals::fooWrapped(const Napi::CallbackInfo& info)
+// Napi::Number signals::foo__wrapped(const Napi::CallbackInfo& info) {
+//   auto env = info.Env();
+//   bool call_ok = info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber();
+//   if (call_ok) {
+//     Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+//   }
+//   auto first = info[0].As<Napi::Number>().Int32Value();
+//   auto second = info[1].As<Napi::Number>().Int32Value();
+//   int returnValue = signals::foo(first, second);
+//   return Napi::Number::New(env, returnValue);
+// }
+
+///////
+//
+// the macros approximate this code for the member getter setter:
+
+// Napi::Value get_debug__wrapped(const Napi::CallbackInfo& info) {
+//   Napi::Env env = info.Env();
+//   return Napi::Number::New(env, soapy->flushHiggs->debug);
+// }
+// Napi::Value set_debug__wrapped(const Napi::CallbackInfo& info) {
+//   Napi::Env env = info.Env();
+//   auto arg0 = info[0].As<Napi::Number>().Int32Value();
+//   soapy->flushHiggs->debug = arg0;
+// }
+
+
+
+
+// eof

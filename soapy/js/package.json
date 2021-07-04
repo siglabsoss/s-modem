@@ -1,0 +1,44 @@
+{
+   "name": "s-modem-js",
+   "version": "1.0.0",
+   "main": "index.js",
+   "dependencies": {
+      "bops": "^1.0.0",
+      "commander": "^2.19.0",
+      "compute-argmax": "^1.0.0",
+      "compute-argmin": "^1.0.1",
+      "csv-parser": "^2.1.0",
+      "dot-object": "^1.7.1",
+      "fft": "^0.2.1",
+      "fili": "^2.0.3",
+      "gnu-plot": "^0.1.6",
+      "grain-rpc": "^0.1.6",
+      "integer": "^2.1.0",
+      "jsverify": "^0.8.4",
+      "kind-of": "^6.0.2",
+      "lodash": "^4.17.11",
+      "mathjs": "^5.4.0",
+      "mocha": "^5.2.0",
+      "mustache": "latest",
+      "nan": "^2.12.1",
+      "node-addon-api": "latest",
+      "node-gyp": "^3.8.0",
+      "prando": "^5.1.0",
+      "pythonic": "^1.0.1"
+   },
+   "scripts": {
+      "build_changed": "node-gyp build -j 4",
+      "build": "node-gyp rebuild",
+      "clean": "node-gyp clean && make clean",
+      "all": "npm run clean && npm run compile && npm run build && npm run test",
+      "test": "NODE_OPTIONS=--experimental-worker node node_modules/.bin/mocha"
+   },
+   "gypfile": true,
+   "devDependencies": {
+      "chart.js": "^2.7.3",
+      "chartjs-node": "^1.7.1",
+      "forever": "^0.15.3"
+   },
+   "author": "siglabs",
+   "license": "none"
+}

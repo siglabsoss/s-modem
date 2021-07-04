@@ -1,0 +1,32 @@
+{
+  "name": "s-modem-js",
+  "version": "1.0.0",
+  "main": "",
+  "dependencies": {
+    "cli-color": "^1.4.0",
+    "cmake-js": "^5.1.0",
+    "evloop-monitor": "^0.1.0",
+    "grain-rpc": "^0.1.6",
+    "javascript-state-machine": "^3.1.0",
+    "jsverify": "^0.8.4",
+    "lowdb": "^1.0.0",
+    "luxon": "^1.17.2",
+    "mocha": "^6.1.4",
+    "node-addon-api": "^1.6.2",
+    "node-repl": "^2.0.2",
+    "prando": "^5.1.0",
+    "recursive-iterator": "^3.3.0",
+    "repl-client": "^0.3.0",
+    "replify": "^1.2.0",
+    "safe-eval": "^0.4.1",
+    "semver": "^6.1.0",
+    "serialport": "^7.1.5"
+  },
+  "scripts": {
+    "build": "MAKEFLAGS=-j6 cmake-js compile",
+    "clean": "rm -rf ./build",
+    "check_nvm": "node -e \"if(!require('semver').satisfies(process.version, '>=11.0.0')) {console.log(Buffer.from('CgoKISEhISAtPiAgICAgTm9kZSB2ZXJzaW9uIHdhcyB3cm9uZywgcGxlYXNlIHJ1bjogICBudm0gdXNlIDExICAgICA8LSAhISEhCgoK', 'base64').toString('ascii')); process.exit(1);}\""
+  },
+  "author": "siglabs",
+  "license": "none"
+}
