@@ -1,0 +1,295 @@
+#pragma once
+
+
+#define __XSTR(s) _STR(s)
+#define __STR(s) #s
+
+
+///////
+//
+// Add new return types here
+
+#define __RETURNTYPE_int Napi::Number
+#define __RETURNTYPE_uint32_t Napi::Number
+#define __RETURNTYPE_double Napi::Number
+#define __RETURNTYPE_bool Napi::Boolean
+#define __RETURNTYPE_string Napi::String
+#define __RETURNTYPE_void void
+
+
+///////
+//
+// For every type the system will see, you must copy a line here
+// void is the only type that does not have this line
+
+#define _CAP_RETURN_double auto returnValue = 
+#define _CAP_RETURN_int auto returnValue = 
+#define _CAP_RETURN_uint32_t auto returnValue = 
+#define _CAP_RETURN_bool auto returnValue = 
+#define _CAP_RETURN_string auto returnValue = 
+#define _CAP_RETURN_unsigned auto returnValue = 
+#define _CAP_RETURN_void
+
+
+
+///////
+//
+// Add new code to check valid inputs for combinations of inputs
+
+#define _NAPI_VALIDATE_INPUTS_int_int(fn) \
+  bool call_notok = info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException(); \
+  }
+
+
+#define _NAPI_VALIDATE_INPUTS_int(fn) \
+  bool call_notok = info.Length() < 1 || !info[0].IsNumber(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_bool(fn) \
+  bool call_notok = info.Length() < 1 || !info[0].IsBoolean(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Argument of bool expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_uint32_t(fn) \
+  bool call_notok = info.Length() < 1 || !info[0].IsNumber(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_uint32_t_uint32_t_uint32_t(fn) \
+  bool call_notok = info.Length() < 3 || !info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsNumber(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Argument of uint32_t uint32_t uint32_t expected").ThrowAsJavaScriptException(); \
+  }
+
+
+#define _NAPI_VALIDATE_INPUTS_string(fn) \
+  bool call_notok = info.Length() < 1 || !info[0].IsString(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_double_string(fn) \
+  bool call_notok = info.Length() < 2 || !info[0].IsNumber() || !info[1].IsString(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Argument of double string expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_bool_string(fn) \
+  bool call_notok = info.Length() < 2 || !info[0].IsBoolean() || !info[1].IsString(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Argument of bool string expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_string_string(fn) \
+  bool call_notok = info.Length() < 2 || !info[0].IsString() || !info[1].IsString(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Argument of 2 strings expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_int_string(fn) \
+  bool call_notok = info.Length() < 2 || !info[0].IsNumber() || !info[1].IsString(); \
+  if (call_notok) { \
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException(); \
+  }
+
+#define _NAPI_VALIDATE_INPUTS_void(fn) \
+  bool call_notok = info.Length() != 0; \
+  if (call_notok) { \
+    Napi::TypeError::New(env, __STR(fn) "() not expecting arguments").ThrowAsJavaScriptException(); \
+  }
+
+
+///////
+//
+// Add new code to pass args for combinations of signatures
+// this could be combined with previous section
+
+#define _NAPI_CALL_int(path,fn,rt) \
+auto first = info[0].As<Napi::Number>().Int32Value(); \
+_CAP_RETURN(rt) path fn(first);
+
+#define _NAPI_CALL_bool(path,fn,rt) \
+auto first = info[0].As<Napi::Boolean>(); \
+_CAP_RETURN(rt) path fn(first);
+
+#define _NAPI_CALL_uint32_t(path,fn,rt) \
+auto first = info[0].As<Napi::Number>().Uint32Value(); \
+_CAP_RETURN(rt) path fn(first);
+
+#define _NAPI_CALL_uint32_t_uint32_t_uint32_t(path,fn,rt) \
+auto first  = info[0].As<Napi::Number>().Uint32Value(); \
+auto second = info[1].As<Napi::Number>().Uint32Value(); \
+auto third  = info[2].As<Napi::Number>().Uint32Value(); \
+_CAP_RETURN(rt) path fn(first,second,third);
+
+#define _NAPI_CALL_string(path,fn,rt) \
+auto first = info[0].As<Napi::String>(); \
+_CAP_RETURN(rt) path fn(first);
+
+#define _NAPI_CALL_double_string(path,fn,rt) \
+auto first  = info[0].As<Napi::Number>(); \
+auto second = info[1].As<Napi::String>(); \
+_CAP_RETURN(rt) path fn(first, second);
+
+#define _NAPI_CALL_bool_string(path,fn,rt) \
+auto first  = info[0].As<Napi::Boolean>(); \
+auto second = info[1].As<Napi::String>(); \
+_CAP_RETURN(rt) path fn(first, second);
+
+#define _NAPI_CALL_string_string(path,fn,rt) \
+auto first  = info[0].As<Napi::String>(); \
+auto second = info[1].As<Napi::String>(); \
+_CAP_RETURN(rt) path fn(first, second);
+
+#define _NAPI_CALL_int_string(path,fn,rt) \
+auto first  = info[0].As<Napi::Number>().Int32Value(); \
+auto second = info[1].As<Napi::String>(); \
+_CAP_RETURN(rt) path fn(first, second);
+
+#define _NAPI_CALL_int_int(path,fn,rt) \
+auto first  = info[0].As<Napi::Number>().Int32Value(); \
+auto second = info[1].As<Napi::Number>().Int32Value(); \
+_CAP_RETURN(rt) path fn(first, second);
+
+#define _NAPI_CALL_void(path,fn,rt) \
+_CAP_RETURN(rt) path fn();
+
+
+///////
+//
+// Add new code for converting return types
+
+#define _NAPI_TAIL_int() \
+  return Napi::Number::New(env, returnValue ); \
+}
+
+#define _NAPI_TAIL_double() \
+  return Napi::Number::New(env, returnValue ); \
+}
+
+#define _NAPI_TAIL_bool() \
+  return Napi::Boolean::New(env, returnValue ); \
+}
+
+#define _NAPI_TAIL_string() \
+  return Napi::String::New(env, returnValue ); \
+}
+
+#define _NAPI_TAIL_void() \
+  return ; \
+}
+
+#define _NAPI_TAIL_uint32_t() \
+  return Napi::Number::New(env, returnValue ); \
+}
+
+
+
+
+#define _NAPI_HEADER(rt,fn) __RETURNTYPE_##rt fn##__wrapped(const Napi::CallbackInfo& info);
+
+
+#define _NAPI_HEAD(path,x,rt) __RETURNTYPE_##rt path x##__wrapped (const Napi::CallbackInfo& info) { \
+  auto env = info.Env();
+
+
+
+// https://stackoverflow.com/questions/2831934/how-to-use-if-inside-define-in-the-c-preprocessor
+#define _CAP_RETURN2(x) _CAP_RETURN_##x
+#define _CAP_RETURN(x) _CAP_RETURN2(x)
+
+
+
+
+
+#define _VA_GET(_1, _2, _3, _4, N, ...) N
+
+#define _VA_COUNT(...) _GET_NTH_ARG(__VA_ARGS__, 4, 3, 2, 1)
+
+
+
+
+/////////////////
+//
+// Manual versions of variadic function
+// Call this in the body
+// The inputs are
+// path, anything before the function name (ie namespace::namespace2:: ) 
+// fn, the function name
+// rt, the return type (void is valid as well)
+// t0, t1, ... the n input types
+
+#define _GET_NAPI_BODY_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define _NAPI_BODY(...) \
+_GET_NAPI_BODY_MACRO(__VA_ARGS__, _NAPI_BODY7, _NAPI_BODY6, _NAPI_BODY5, _NAPI_BODY4, _NAPI_BODY3, _NAPI_BODY2)(__VA_ARGS__)
+
+
+#define _NAPI_BODY2(fn, rt) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_CALL_##rt(, fn) \
+_NAPI_TAIL_##rt()
+
+#define _NAPI_BODY3(fn, rt, t0) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##t0(fn) \
+_NAPI_CALL_##t0(, fn, rt) \
+_NAPI_TAIL_##rt()
+
+#define _NAPI_BODY4(fn, rt, t0, t1) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##t0##_##t1(fn) \
+_NAPI_CALL_##t0##_##t1(, fn, rt) \
+_NAPI_TAIL_##rt()
+
+#define _NAPI_BODY5(fn, rt, t0, t1, t2) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##t0##_##t1##_##t2(fn) \
+_NAPI_CALL_##t0##_##t1##_##t2(, fn, rt) \
+_NAPI_TAIL_##rt()
+
+
+#define _GET_NAPI_MEMBER_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define _NAPI_MEMBER(...) \
+_GET_NAPI_MEMBER_MACRO(__VA_ARGS__, _NAPI_MEMBER7, _NAPI_MEMBER6, _NAPI_MEMBER5, _NAPI_MEMBER4, _NAPI_MEMBER3, _NAPI_MEMBER2)(__VA_ARGS__)
+
+#define _NAPI_MEMBER4(path, fn, rt, t0) \
+_NAPI_HEAD(,fn,rt) \
+_NAPI_VALIDATE_INPUTS_##t0(fn) \
+_NAPI_CALL_##t0(path, fn, rt) \
+_NAPI_TAIL_##rt()
+
+#define _NAPI_BIND_NAME(name,path,fn) \
+exports.Set(name, Napi::Function::New(env, path fn##__wrapped))
+
+
+#define _NAPI_BIND_MANUAL(name,path,fn) \
+exports.Set(name, Napi::Function::New(env, path fn))
+
+
+/////////
+//
+// graveyard
+//
+// these macros approximate this code:
+
+//Napi::Number signals::fooWrapped(const Napi::CallbackInfo& info)
+// Napi::Number signals::foo__wrapped(const Napi::CallbackInfo& info) {
+//   auto env = info.Env();
+//   bool call_ok = info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber();
+//   if (call_ok) {
+//     Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+//   }
+//   auto first = info[0].As<Napi::Number>().Int32Value();
+//   auto second = info[1].As<Napi::Number>().Int32Value();
+//   int returnValue = signals::foo(first, second);
+//   return Napi::Number::New(env, returnValue);
+// }
+
+
+// eof

@@ -1,0 +1,344 @@
+{
+
+"_____comment":"put , on the first line for easy moving of lines around"
+
+,"net" : {
+	"feedback_bus" :{}
+	,"higgs_udp":{
+		 "higgs_ip":"10.2.2.2"
+		,"pc_ip"   :"10.2.2.1"
+		,"rx_cmd"  :10001
+		,"tx_cmd"  :20000
+		,"tx_data" :30000
+		,"rx_data" :40001
+	}
+	,"zmq":{
+		"listen"   :10005
+		,"comment": "we bind zmq_sock_pub to the port 'listen'"
+		,"publish": {
+			"inbound":false
+			,"port":10004
+		}
+	}
+	,"dashboard": {
+		"ip":"127.0.0.1"
+		,"port":"10008"
+		,"do_connect":true
+	}
+	,"gnuradio_udp": {
+		"ip":"127.0.0.1"
+		,"port":"10006"
+		,"port_2":"10016"
+		,"_comment": "must not be set if net.gnuradio_attached.send_data is true"
+		,"do_connect":true
+		,"__comment": "Send eq data to gnuradio on a separate port"
+		,"do_connect_2":true
+		,"downsample":0
+	}
+	,"gnuradio_attached": {
+		"_comment": "setting to false will disable normal soapy/gnuradio operation"
+		,"send_data":false
+	}
+	,"network": {
+		"discovery_port0": 10006
+		,"discovery_port1": 10007
+		,"discovery_ip": "173.167.119.222"
+		,"comment": "Which ip should our zmq peers use to conenct to us (office ip address)"
+		,"pc_ip_old": "192.168.1.245"
+		,"pc_ip": "107.77.213.185"
+		,"_comment": "Should we fail if pc_ip is not found on our nic? false for LTE"
+		,"enforce_nic_ip":true
+	}
+	,"tun": {
+		"_comment": "will run ip commands"
+		,"create_up_and_ip": true
+		,"ip":"10.2.4.2/24"
+		,"user":"root"
+	}
+}
+
+,"hardware": {
+	"comment":"This section controls automatic bitfile programming"
+	,"bitfile_and_bootload":true
+	,"rx": {
+		"svf":"svf2higgslocal.sh"
+		,"bootload":{
+			"path":"test_mover_9"
+			,"after":{
+				"set_vga":{
+					"enable":true
+					,"attenuation":2
+				},
+				"set_dsa":{
+					"enable":true
+					,"attenuation":6
+				}
+			}
+		}
+	}
+	,"tx": {
+		"svf":"svf2higgs.sh"
+		,"bootload":{
+			"path":"test_tx_9"
+			,"after":{
+				"config_dac":{
+					"enable":true
+				}
+				,"tx_channel":{
+					"enable":true
+					,"channel":"a"
+					,"current":4
+				}
+			}
+		}
+	}
+	,"grav3": {
+		"uart": {
+			"path": "/dev/ttyUSB0"
+		}
+	}
+}
+
+
+,"global" : {
+	"performance" :{
+		"DEBUG_PRINT_LOOPS":true
+	}
+	,"naked": 42
+	,"mole": "rat"
+	,"print" : {
+		 "PRINT_PEER_RB":true
+		,"PRINT_TDMA_SC": 0
+		,"PRINT_SFO_CFO_ESTIMATES": true
+		,"PRINT_COOKED_BER": false
+		,"PRINT_RE_NEW_MESSAGE": false
+		,"PRINT_RE_FINE_SCHEDULE": true
+		,"PRINT_TX_BUFFER_FILL": false
+		,"PRINT_VERIFY_HASH":false
+		,"PRINT_RECEIVED_ZMQ":false
+		,"PRINT_OUTGOING_ZMQ":false
+		,"PRINT_DISPATCH_MOCK_RPC":false
+		,"PRINT_TX_FLUSH_LOW_PRI":false
+		,"PRINT_EVBUF_SOCKET_BURST":false
+	}
+	,"file_dump" : {
+		"sliced_data" : {
+			"enabled":false,
+			"path":"sliced_data3.txt",
+			"_comment": "enabled this and s-modem will dump sliced data to disk.",
+			"__comment": "Open the results with a unit test to fix demodulation bugs "
+		}
+	}
+}
+
+,"dashboard": {
+	"only_update_channel_angle_r0": true
+	,"channel_angle_rate_divisor": 12
+}
+
+,"fsm":{
+	"radio_estimate": {
+		"comment":"Can be either 'c' or 'js' "
+		,"type": "c"
+	}
+	,"dsp": {
+		"rx": {
+			"comment":"Can be either 'c' or 'js'.  (this value is not used)"
+			,"type": "c"
+		}
+		,"tx": {
+			"comment":"Can be either 'c' or 'js'.  (this value is not used)"
+			,"type": "c"
+		}
+	}
+}
+
+,"dsp": {
+	"demod" : {
+		"CONSIDER_DEMOD_DELAY_THRESH":50
+	}
+
+	,"sfo" : {
+		"state_thresh": 0.05
+		,"sfo_estimate_wait": 2
+		,"___comment":"// this number may be very different for different txs. previous is 800"
+		,"FITTING_THRESHOLD":5000
+		,"background_tolerance":{
+			 "upper": 0.1
+			,"lower": 0.03
+		}
+		,"restimate_tolerance": 10
+		,"symbol_num": 102400
+		,"peers": {
+			"t0": -21.5
+			,"t1": -1.9
+		}
+		,"max_step":0.1        ,"_comment":"Maximum sfo value is applied per update.  This value MUST be positive"
+		,"reset_zero":true
+		,"apply_initial":true
+		,"adjust_using_eq": {
+			"comment": "This will not work if sfo.adjust_using_eq.enable is false."
+			,"_comment": "See calculateEqToSfo() for details about these values"
+			,"enable":true
+			,"seconds":40
+			,"trend":2
+			,"factor":1.0
+		}
+	}
+
+	,"cfo": {
+		"__comment":""
+		,"state_threshold": 1
+		,"background_tolerance":{
+			 "upper": 0.1
+			,"lower": 0.01
+		}
+		,"_comment":"ratio of buffer pulls from cfo buffer into residue buffer"
+		,"pull_ratio":100
+		,"symbol_num": 102400
+		,"peers": {
+			"t0": -650
+			,"t1": -57
+		}
+		,"reset_zero":true
+		,"apply_initial":true
+		,"adjust_using_residue":true    ,"___comment":"Converts residue into tiny cfo adjustments"
+
+	}
+	,"sto": {
+		"margin": 64     ,"comment": "This is applied to our sto estimate.  This happens after coarse est"
+		,"adjust_using_eq": {
+			"enable":true
+			,"threshold":1
+			,"half_sc":320  ,"comment": "Set this to half the number of the largest subcarrier, this is how many subcarriers from the center to use for estimation"
+		}
+		,"disable_positive_adjustment":true
+	}
+	,"coarse": {
+		"tweak": 192      ,"comment": "This is applied to the coarse estimate"
+		,"coarse_sync_ofdm_num":1000
+	}
+	,"eq": {
+		"use_filter":true
+		,"update_seconds":4.0
+		,"magnitude_divisor": 1.0
+	}
+	,"residue": {
+		"dump": {
+			"enabled":false
+			,"filename":"save_residue3.txt"
+		}
+		,"dump_upstream": {
+			"enabled":false
+			,"filename":"residue_upstream4.txt"
+		}
+		,"comment": "only apply every Nth residue update."
+		,"rate_divisor": 6
+	}
+
+	,"block_fsm": false
+}
+
+,"ringbus": {
+	"hash_check": {
+		"_comment":"Requires riscv to call ringbus_enable_readback(1).  Enable to check hashes read back "
+		,"enable":true
+		,"print":false
+	}
+}
+
+,"data": {
+	"comment":"If no packets are queued to transmit, make sure 1 is always sent per period"
+	,"send_packet_when_idle":true
+	,"hash": {
+		"_comment": "This will cause both sides to zmq the hash of every packet"
+		,"validate_all":true
+	}
+}
+
+,"adc": {
+	"gain": {
+		"_comment": "convert this number to hex better understand value"
+		,"dsa":704
+		,"__comment": "attenuation, 0-30.  Do not use 'dsa' above"
+		,"dsa_db":24
+	}
+}
+
+
+,"_______comment": "exp is short for experiment"
+
+,"exp": {
+	"our": {
+		"role":"rx"
+		,"zmq_name": "laptop"
+		,"id": 17,         "comment":"This should match rx_master_peer or peers[t0/t1].  This can be read from soapy->this_node.id"
+	}
+	,"peers": {
+		 "t0":1
+		,"t1":2
+		,"arb":18
+	}
+	,"DSP_WAIT_FOR_PEERS": 1
+	,"___comment": "this must match what the node.csv has"
+	,"rx_master_peer": 17
+
+	,"_____comment": "should rx publish tun to arb? previous behavior was false"
+	,"rx_tun_to_arb":true
+
+	,"fsm_skip_r1":true
+
+	,"fsm_arbiter_data":true
+	,"poll_rx_for_cpu_load": false
+	,"debug_eq_before_schedule":false
+	,"tdma_force_first_row":false
+	,"test_coarse_mode":false
+	,"test_coarse_mode_and_adjust":false
+	,"_comment":"this one tells the rx side to send a debug message to tx side after sync"
+	,"debug_tx_epoc":false
+	,"____comment":"similar to debug_tx_local_epoc, sends randomized zmq messages"
+	,"debug_tx_epoc_and_zmq":false
+	,"flood_ping_test":false
+	,"debug_tx_local_epoc":false
+	,"__comment":"set this and use tx side only, without rx radio. Tests smodem->cs20 communications through mapmov"
+	,"debug_tx_fill_level":false
+	,"debug_tx_reset_fb_only":false
+	,"dashtie_into_mock":false
+	,"debug_loopback_demod_data":false
+	,"flood_rb_test":false
+	,"skip_check_attached_fb":false
+	,"skip_check_fb_datarate":false
+	,"retry_reset_fb_bus_after_down":false
+	,"allow_cs20_fb_crash":false
+	,"integration_test": {
+		 "run_time":120
+		,"test_enabled":false
+	}
+	,"js": {
+		 "comment":"Controls in this section are read by js code."
+		,"pseudo_random_pattern": {
+			"tx_inject":false
+			,"rx_catch":false
+		}
+		,"beamform_userdata_pattern": {
+			"rx_catch":false
+		}
+	}
+	,"retry": {
+		"coarse": {
+			"enable":false
+			,"randomize":true
+		}
+	}
+	,"stall_before_r0_fine_sync":false
+}
+
+,"runtime": {
+	"_comment":"do not add values here, these will be created at runtime"
+}
+
+,"demod":{
+	"disable_open_once":true
+}
+
+}

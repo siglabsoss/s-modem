@@ -1,0 +1,49 @@
+[
+	{
+		"name": "sayHello",
+		"params": {
+			"name": "Peter"
+		},
+		"returns" : "Hello Peter"
+	},
+	{
+		"name" : "advanceTiming",
+		"params": {
+			"samples": 0
+		}
+	},
+	{
+		"name" : "triggerSymbolSync"
+	},
+	{
+		"name" : "triggerFineSync"
+	},
+	{
+		"name" : "resetExperiment"
+	},
+	{
+		"name" : "resetBER"
+	},
+	{
+		"name" : "sendChannelEq"
+	},
+	{
+		"name" : "resetChannelEq"
+	},
+	{
+		"name" : "zeroChannelEq"
+	},
+	{
+		"name" : "triggerTxSymbolSync"
+	},
+	{
+		"name" : "setScheduleMode",
+		"params": {
+			"radio_index": 0,
+			"value": 0
+		}
+	},
+	{
+		"name" : "fudgeR0Schedule"
+	}
+]

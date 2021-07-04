@@ -1,0 +1,66 @@
+{
+
+"_____comment":"put , on the first line for easy moving of lines around"
+
+,"net" : {
+	"feedback_bus" :{}
+	,"higgs_udp":{}
+	,"dashboard": {
+		"ip":"192.168.1.63"
+		,"port":"10008"
+		,"do_connect":true
+	}
+}
+
+
+,"global" : {
+	"performance" :{
+		"DEBUG_PRINT_LOOPS":true
+	}
+	,"naked": 42
+	,"mole": "rat"
+	,"print" : {
+		 "PRINT_PEER_RB":false
+		,"PRINT_TDMA_SC": 16
+	}
+}
+
+
+,"dsp": {
+	"demod" : {
+	"CONSIDER_DEMOD_DELAY_THRESH":50
+	}
+	,"block_fsm": false
+}
+
+
+,"_______comment": "exp is short for experiment"
+
+,"exp": {
+	"our": {
+		"role":"rx"
+	}
+	,"peers": {
+		 "t0":1
+		,"t1":2
+	}
+	,"DSP_WAIT_FOR_PEERS": 2
+	,"___comment": "this must match what the node.csv has"
+	,"rx_master_peer": 17
+
+	,"control": {
+		"skip_wait_peers": false
+	}
+	,"poll_rx_for_cpu_load": false
+	,"fsm_skip_r1":true
+}
+
+,"demod":{
+	"disable_open_once":true
+}
+
+,"___comment":"next are legacy"
+
+
+
+}

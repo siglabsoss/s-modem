@@ -1,3 +1,9 @@
 [submodule "soapy/src/3rd/rapidcheck"]
 	path = soapy/src/3rd/rapidcheck
 	url = git@github.com:esromneb/rapidcheck.git
+[submodule "soapy/src/3rd/schifra"]
+	path = soapy/src/3rd/schifra
+	url = git@github.com:ArashPartow/schifra.git
+[submodule "soapy/src/3rd/turbofec"]
+	path = soapy/src/3rd/turbofec
+	url = git@github.com:ttsou/turbofec.git

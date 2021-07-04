@@ -1,0 +1,16 @@
+{
+
+"_____comment":"put , on the first line for easy moving of lines around"
+
+,"net" : {
+	"higgs_udp":{
+		 "higgs_ip":"127.0.0.1"
+		,"pc_ip"   :"127.0.0.1"
+		,"rx_cmd"  :10001
+		,"tx_cmd"  :20000
+		,"tx_data" :30000
+		,"rx_data" :40001
+	}
+}
+
+}
