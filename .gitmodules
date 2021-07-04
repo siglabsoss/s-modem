@@ -1,0 +1,3 @@
+[submodule "soapy/src/3rd/rapidcheck"]
+	path = soapy/src/3rd/rapidcheck
+	url = git@github.com:esromneb/rapidcheck.git
